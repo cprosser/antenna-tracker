@@ -5,7 +5,7 @@ Subtree commands for refreshing libraries here:
 git subtree add --prefix cm-controller-esp32/lib/IRremoteESP8266 https://github.com/crankyoldgit/IRremoteESP8266.git master --squash
 
 # This updates it
-git subtree pull --prefix cm-controller-esp32/lib https://github.com/crankyoldgit/IRremoteESP8266.git master --squash
+git subtree pull --prefix cm-controller-esp32/lib/IRremoteESP8266 https://github.com/crankyoldgit/IRremoteESP8266.git master --squash
 
 
 
