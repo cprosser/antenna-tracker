@@ -1,4 +1,8 @@
 #include <Arduino.h>
+#include "IRremoteESP8266.h"
+#include "DumpIR.h"
+#include "IRsend.h"
+
 /*
 Simple controller for the Channel Master CM9182?
 
@@ -38,16 +42,70 @@ Using ohms law assuming 1.2V drop:
 I'm going to do 3V3 sink into D2. I'm using the DOIT Devkit v1 board and those
 pins are near each other to make it easo to hook in resistor and LED.
 
+Ack. Based on testing this is TOO WEAK. Need to wire up a mosfet or NPN
+to pulse much brighter. I can't find any specs as to what the 3v3 voltage regulator
+can support. Sigh.
+
+Based on IR dump, the remote has a super simple protocol.
+
+It's NEC and the keys on the remote are mapped to the following commands
+
+The address on my device is always 0xAC
+
+Power : 0x1C
+1 : 0x01
+2 : 0x02
+3 : 0x03
+4 : 0x04
+and so on
+The up arrow is 0x10
+0 : 0x00
+The down arrow is 0x11
+
+Most commands consist of 3 characters.
+
+Absolute position is the three number code
+000 - 360
+
+There are some special codes:
+97 DOWN (Disable auto-power off after 8 minutes)
+97 UP (Enable auto-power off)
+
+98 DOWN (Disable auto-sync every 50 moves)
+98 UP (enable auto sync)
+
+00 DOWN (initate sync, takes about 1 minute)
+
 */
 
-const auto LED_PIN = 2;
+#define DUMP_IR false
+
+const auto LED_PIN = 4;
+
+// inverted because I'm using the output as a sink
+IRsend gIRsend(LED_PIN, true);
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(2, OUTPUT);
+#if DUMP_IR
+  DumpIR_setup();
+#else
+  gIRsend.begin();
+#endif
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+#if DUMP_IR
+  DumpIR_loop();
+#else
+
+  gIRsend.sendNEC(gIRsend.encodeNEC(0xAC, 0x09));
+  delay(2000);
+  gIRsend.sendNEC(gIRsend.encodeNEC(0xAC, 0x08));
+  delay(2000);
+  gIRsend.sendNEC(gIRsend.encodeNEC(0xAC, 0x07));
+  delay(10000);
+#endif
 }
