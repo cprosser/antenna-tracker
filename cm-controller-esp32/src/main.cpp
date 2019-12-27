@@ -42,9 +42,25 @@ Using ohms law assuming 1.2V drop:
 I'm going to do 3V3 sink into D2. I'm using the DOIT Devkit v1 board and those
 pins are near each other to make it easo to hook in resistor and LED.
 
+--------------------------------------
+
 Ack. Based on testing this is TOO WEAK. Need to wire up a mosfet or NPN
 to pulse much brighter. I can't find any specs as to what the 3v3 voltage regulator
 can support. Sigh.
+
+I've got a passel of 2N2222A NPN's kicking around: https://learn.sparkfun.com/tutorials/transistors/applications-i-switches
+https://www.onsemi.com/pub/Collateral/PN2222-D.PDF
+
+I'm using  500ohm for a base resistor, (3.3v - 0.7 drop = 2.6V actual). 
+That gives me 5.2mA, current gain between 35 and 50 (from a couple of data sheets) = 182-260mA.
+I'm aiming for 100mA for the LED.
+
+Due to the small size of my breadboard, I can't access Vin which would be preferred. 
+That's driven from USB and would handle 100mA without doubt.
+But I'll just be using 3V3 and hoping I don't melt the voltage regulator. This
+means a 20ohm current limiting resistor for the LED.
+
+---------------------------------------------
 
 Based on IR dump, the remote has a super simple protocol.
 
@@ -82,8 +98,7 @@ There are some special codes:
 
 const auto LED_PIN = 4;
 
-// inverted because I'm using the output as a sink
-IRsend gIRsend(LED_PIN, true);
+IRsend gIRsend(LED_PIN);
 
 void setup() {
   // put your setup code here, to run once:
