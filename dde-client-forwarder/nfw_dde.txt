@@ -1,0 +1,76 @@
+Dynamic Data Exchange (DDE) Specifications for Nova for Windows
+
+Nova for Windows can act as a DDE server.  The program can supply satellite
+tracking and range-rate data to any standard DDE client application; this
+information may be used to implement customized interfaces for antenna tracking
+or radio tuning.
+
+Following are general specification for DDE as implemented in NfW.  Note that all
+names and strings are case sensitive.
+
+DDE Server name  : NFW_SERVER
+DDE conversation : NFW_DATA
+
+DDE is activated when the server (NfW) receives the string 'TUNE ON'.
+
+The AutoTracking Status Box must be displayed in NfW although autotracking does
+not have to be activated.  The status box is displayed if any interface is
+selected from Setup/Antenna rotator.
+
+When DDE has been activated, a single string containing the following data is
+"transmitted" 2-10 times per second (depending on CPU speed and loading) via 
+DDE:
+
+SatName AZ:Azimuth EL:Elevation RR:RangeRate AH:x
+
+where
+     SatName   = the current autotracking satellite name as derived from the NfW
+                 database, maximum 12 characters;
+     Azimuth   = current satellite azimuth, 0.1 degree precision, no sign;
+     Elevation = current satellite elevation, 0.1 degree precision, signed;
+     RangeRate = satellite rate of change of distance from the observer
+                 expressed as a signed floating point number in units of
+                 1/the speed of light.
+     AH        = indicates whether the satellite is above the horizon.
+                 Possible values are Y and N.  NOTE: This indication is in
+                 reference to the horizon table associated with the AutoTracking
+                 Observer.  See AutoTracking/AutoTracking Observer from the Main
+                 Menu to fill in the horizon table.  If the horizon table is not
+                 filled in, a horizon of 0 degrees is assumed.		
+
+One space separates each field; no space after (:) labels.  Make no assumptions
+about field lengths or total string length.  Values are referred to the current
+AutoTracking Observer in NfW at the current UTC time and date.
+
+Sample DDE string:
+Mir AZ:116.4 EL:-21.0 RR:-1.4396996895 AH:N
+
+To find Doppler shift from Range Rate,
+DopplerHz = -FreqHz * RR * (1.0/299792.458)
+
+Additions 4-10-01
+
+Autotracking in Nova for Windows can be controlled from a DDE client.  Forcing
+the DDE string by the client (in Delphi, this is with the command "PokeData")
+affects Nova in the following way:
+
+TUNE ON    turns DDE output on
+TUNE OFF   turns DDE output off
+TRACK ON   turns autotracking on
+TRACK OFF  turns autotracking off
+SAT=*      sets the AutoTracking satellite.
+            *=the desired satellite catalog number
+ANTAZ=xxx.xx  tell Nova the current antenna Az/El
+ANTEL=xx.xx
+
+Diagnostic displays of incoming and outgoing DDE strings are available by
+pressing the F1(outgoing) or F3(incoming) keys.
+
+M.R. Owen
+Northern Lights Software Associates
+nlsa@nlsa.com
+http://www.nlsa.com
+4-10-01
+
+
+
