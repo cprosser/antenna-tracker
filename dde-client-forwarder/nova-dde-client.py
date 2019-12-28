@@ -1,10 +1,7 @@
-import time
-import win32ui, dde
-
-
-
 #!/usr/bin/env python
 # Send DDE Execute command to running program
+
+# cprosser, this is from: http://code.activestate.com/recipes/577654-dde-client/
 
 from ctypes import POINTER, WINFUNCTYPE, c_char_p, c_void_p, c_int, c_ulong, c_char_p
 from ctypes.wintypes import BOOL, DWORD, BYTE, INT, LPCWSTR, UINT, ULONG
